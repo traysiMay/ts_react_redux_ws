@@ -6,9 +6,13 @@ export type RootState = {
   socket: any;
 };
 
-export type Action = {
+export type SocketPayload = {
+  socket: any;
+};
+
+export type Action<T> = {
   type: string;
-  payload?: object;
+  payload: T;
 };
 
 const initialState: RootState = {
@@ -17,10 +21,15 @@ const initialState: RootState = {
   socket: null
 };
 
-const reducer = (state: RootState = initialState, action: Action) => {
+const reducer = (
+  state: RootState = initialState,
+  action: Action<SocketPayload>
+) => {
+  console.log(action);
   switch (action.type) {
     case CONNECTING:
-      return { ...state, readyState: 1 };
+      const { socket } = action.payload;
+      return { ...state, readyState: 1, socket };
     case CONNECTED:
       return { ...state, readyState: 2, connected: true };
     default:

@@ -17,11 +17,11 @@ interface SocketConnected {
 }
 
 export const connectSocket = (): AppThunk => async dispatch => {
-  dispatch({ type: CONNECTING });
   const socket = io(process.env.REACT_APP_SERVER as string);
+  dispatch({ type: CONNECTING, payload: { socket } });
   socket.on(CONNECTED, (connected: SocketConnected) => {
     if (connected) {
-      dispatch({ type: CONNECTED });
+      dispatch({ type: CONNECTED, payload: null });
     }
   });
 };
