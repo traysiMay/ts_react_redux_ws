@@ -3,7 +3,7 @@ import { CONNECTING, CONNECTED } from "./actions";
 export type RootState = {
   connected: boolean;
   readyState: number;
-  socket: any;
+  socket: WebSocket | null;
 };
 
 export type SocketPayload = {
@@ -25,7 +25,6 @@ const reducer = (
   state: RootState = initialState,
   action: Action<SocketPayload>
 ) => {
-  console.log(action);
   switch (action.type) {
     case CONNECTING:
       const { socket } = action.payload;
