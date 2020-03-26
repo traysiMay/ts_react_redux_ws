@@ -1,28 +1,27 @@
-import { CONNECTING, CONNECTED } from "./actions";
+import { CONNECTING, CONNECTED } from "../actions";
+import { Action } from "./";
 
-export type RootState = {
+export type State = {
   connected: boolean;
   readyState: number;
   socket: WebSocket | null;
+  messages: string[];
 };
 
 export type SocketPayload = {
   socket: any;
+  message: string;
 };
 
-export type Action<T> = {
-  type: string;
-  payload: T;
-};
-
-const initialState: RootState = {
+const initialState: State = {
   connected: false,
   readyState: 0,
-  socket: null
+  socket: null,
+  messages: []
 };
 
 const reducer = (
-  state: RootState = initialState,
+  state: State = initialState,
   action: Action<SocketPayload>
 ) => {
   switch (action.type) {
@@ -31,6 +30,11 @@ const reducer = (
       return { ...state, readyState: 1, socket };
     case CONNECTED:
       return { ...state, readyState: 2, connected: true };
+    case "NEW_MESSAGE":
+      return {
+        ...state,
+        messages: [...state.messages, action.payload.message]
+      };
     default:
       return state;
   }

@@ -1,18 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import { connect } from "react-redux";
-import { RootState } from "./reducers";
+import { State } from "./reducers";
+import { State as SocketState } from "./reducers/socket";
+import { State as ShowsState } from "./reducers/shows";
+import { Switch, Route, Link } from "react-router-dom";
+import Home from "./containers/Home";
+import Purchase from "./containers/Purchase";
+import { initShows } from "./actions";
+import Checkout from "./containers/Checkout";
+import Ticket from "./containers/Ticket";
+import Creator from "./Creator";
+import Waiting from "./Waiting";
+import { Logo } from "./containers/Logo";
 
-function App(state: RootState) {
-  if (state.readyState === 1) {
-    return <div>connecting...</div>;
-  }
-  if (state.readyState === 2 && state.connected === true) {
-    return <div>connected</div>;
-  }
-  return <div className="App">This is the app</div>;
+interface Props {
+  socket: SocketState;
+  dispatch: any;
+  shows: ShowsState;
 }
 
-const mapStateToProps = (state: RootState) => state;
+function App({ dispatch, socket, shows }: Props) {
+  useEffect(() => {
+    dispatch(initShows());
+  }, []);
+  if (socket.readyState === 1) {
+    return <div>connecting...</div>;
+  }
+  if (shows.loading) return <div>loading...</div>;
+  if (shows.status === "creator") return <Creator />;
+  if (shows.status === "waiter") return <Waiting />;
+  return (
+    <div>
+      <Link to="/">
+        <Logo />
+      </Link>
+      <Switch>
+        <Route path="/purchase/:id" component={Purchase} />
+        <Route path="/checkout/:id" component={Checkout} />
+        <Route path="/ticket/:id" component={Ticket} />
+        <Route path="/" component={Home} />
+      </Switch>
+    </div>
+  );
+}
 
-export default connect(mapStateToProps)(App);
+const mapStateToProps = ({ socket, shows }: State) => ({ socket, shows });
+const mapDispatchToProps = (dispatch: any) => ({ dispatch });
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
